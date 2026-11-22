@@ -1,49 +1,22 @@
-# family-template
+# bid-screens
 
-Start a new scraping family for the s1d-labs pool. A family is one kind of site (or one platform many sites share); the pool runs
-its code on members' GitHub Actions minutes. This template is a complete, working family for
-[books.toscrape.com](https://books.toscrape.com) (a public site made for scraping practice): copy it, then change it.
+A compute family of the s1d-labs scrape pool: statistical **bid screens** (indicators used by competition authorities) on
+public bid data from GeM and the GePNIC tender portals. It scrapes nothing: inputs are Parquet shards that the database box
+exports into the family owner's bucket, the pool's GitHub runners compute the screens, and results go back to the bucket.
+A screen flag is an **indicator** ("screen flags"), never a finding about any firm.
 
-## Make your family
-
-1. Ask the hub owner to **add the family** on [scrape.s1d.me/runners](https://scrape.s1d.me/runners) (name, what it scrapes, owner).
-   The hub creates `s1d-labs/<family>` from this template, names the family in `scrape.json`, and makes the owner admin
-   (with the GitHub account they added on home.s1d.me).
-2. Clone it: `gh repo clone s1d-labs/<family>`.
-3. In your repo:
-   - `scrape.json`: set `"family"` to the family name; list your tasks (one command each) and setup steps.
-   - `family.py`: your projects (one queue of work per site), their target hosts, the env your command needs, the queue items,
-     and the health checks.
-   - `crawl.py` (or whatever your tasks run): the scraper.
-   - `README.md`: replace this text with your family's own: what it scrapes, its projects and tasks, and how to run the check.
-     Delete `crawl.py`, `tests/pages/catalogue-page-1.html` and the example test when your own task replaces them.
-4. **Check it**: `scrape-check` in the repo (needs `pip install "scrape-hub-client @ git+https://github.com/s1d-labs/runner@sdk-stable#subdirectory=sdk"`).
-   It runs your setup and task against a local stand-in hub on 3 real items and says what works. The **check** workflow runs it
-   (and `tests/`) on every push.
-5. Run the **setup** workflow (Actions → setup → Run workflow). It registers the projects, puts them in the pool and registers
-   the health checks.
-6. The hub starts runs in members' accounts when the pool is on and there is work. Watch it on scrape.s1d.me.
-
-## What your code gets
-
-The pool worker ([s1d-labs/runner](https://github.com/s1d-labs/runner)) checks out this repo at `main`, runs the `setup` steps from
-`scrape.json`, and for each assignment runs the task's command here with:
-
-| Variable | What |
+| Path | What |
 |---|---|
-| `SCRAPE_POOL_PROJECT` | the project to work on |
-| `SCRAPE_JOB_INDEX`, `SCRAPE_TOTAL_JOBS` | this worker's slice |
-| `SCRAPE_MAX_HOURS` | how long the command may run |
-| `SCRAPE_HUB_URL` | the hub |
-| your project's `env` | e.g. `SITE` |
+| `screens/bidscreens_v1.py` | version 1 screens, frozen before the pilot (byte-identical to the pre-registered file) |
+| `screens/v2.py` | version 2: B-to-reverse-auction join, sync2, technical disqualification, cover with firm control, closed bidder set |
+| `screens/labels.py` | held-out validation cases (fixed before any v2 value was computed) |
+| `screens/fastpairs.py` | vectorised pair builder (same rows as v1, speed only) |
+| `run_shard.py` | task `screens`: one shard at a time -> `out/<shard>/*.parquet` + a summary record |
+| `rank.py` | task `rank`: national composites, base rates, validation, lead lists -> `national/<run>/` |
+| `export/` | box side: `gem_export.py`, `gepnic_export.py` (+ `.sql`), `push.sh`/`push.py` (upload with the hub's client), `seed.py` |
 
-Use `scrape_hub_client` (`HubClient`) to claim queue items, store records, upload files and report counters. Exit when there is
-nothing left; the worker then asks the hub for the next assignment.
+Projects: `bid-screens-gem`, `bid-screens-gepnic` (task `screens`), `bid-screens-rank` (task `rank`); 58 + 20 + 1 worker
+processes at most (<= 40 runner jobs). Queue items name bucket keys and the pinned code hash; the task refuses another hash.
 
-## Rules (the full contract is in CLAUDE.md, written for people and for Claude Code)
-
-- **Be polite.** Use `hub.settings["threads"]` and `delay_ms`, idle while `hub.settings["paused"]`, and report `n_http` and
-  `t_http_s` for every request and `http_<code>` / `http_error` for failures: the hub throttles you from these.
-- **Files go through the hub** (`hub.upload_many`): it signs each upload into the family's bucket (500 GB per member) and stops at
-  the cap. Never put storage keys in this repo.
-- **Public data only**; read the site's terms first. See the team docs on home.s1d.me (Scraping rules).
+Check: `python -m pytest tests` and
+`scrape-check --project bid-screens-gem --task screens --env BID_SCREENS_MIN_BUDGET_MIN=2 --item '{"key":"s1","payload":{"shard":"check/s1","source":"gem","synthetic":150}}'`.

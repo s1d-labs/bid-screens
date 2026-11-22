@@ -284,3 +284,10 @@ Reports from this repo use ASD-STE100 Simplified Technical English (STE). This i
 - Reports for other people go to https://pub.s1d.me: run `pub publish FILE` in a team box. New items are password-protected. Team members signed in with id.s1d.me open them with no password. Outsiders need the secret link or the password (`pub show SLUG`).
 
 Full summary with examples: team doc `18-writing-standard` (in a team box: `/usr/local/share/team-docs/18-writing-standard.md`).
+
+## This family (bid-screens)
+
+Compute only: no target site, no probes. Inputs are written by `export/` on the database box and seeded there (`seed.py`);
+`setup_family.py` only registers the projects. Definitions are pre-registered (bet-3 research folder, `preregistration-v2.md`
+with the sha256 of every screen file): do not change `screens/*.py` or `run_shard.py` without a dated amendment there, and
+avoid pushing while a run is in progress. Results that name firms stay in the bucket and are internal.
