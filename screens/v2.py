@@ -145,7 +145,7 @@ def sync2(ts, be, rng=None):
           & (x["submitted_at"] >= x["published"]) & (x["submitted_at"] <= x["end"])].copy()
     out = pd.DataFrame({"tender_id": ts["tender_id"]})
     if x.empty:
-        return out.assign(n_early=0, sync2_k=np.nan, sync2_p=np.nan, sync2_score=np.nan, sync2_flag=np.nan)
+        return out.assign(n_early=0, sync2_k=np.nan, sync2_p=np.nan, sync2_score=np.nan, sync2_flag=np.nan, sync2_pct=np.nan)
     x["W"] = (x["end"] - x["published"]).dt.total_seconds() / 60.0
     x["tm"] = (x["submitted_at"] - x["published"]).dt.total_seconds() / 60.0
     x["u"] = (x["tm"] / x["W"]).clip(0, 1)
@@ -307,6 +307,9 @@ def finish(ts, g, links, cs_t):
     else:
         ts["pair_v2_t"] = 0.0
     ts.loc[ts["n_submitted"] < 2, "pair_v2_t"] = np.nan
+    for c in TENDER_PARTS:                       # A3: a part a shard cannot compute is NaN (e.g. no submission times)
+        if c not in ts:
+            ts[c] = np.nan
     ts["tender_v2"] = ts[TENDER_PARTS].mean(axis=1, skipna=True)
     return ts
 

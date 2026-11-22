@@ -35,7 +35,8 @@ MIN_BUDGET_MIN = float(os.environ.get("BID_SCREENS_MIN_BUDGET_MIN", "30"))   # n
 V1_ROUNDS = 200
 # preregistration-v2 A1: the hash before the tie12 bug fix; its definitions are the same, so its items run here too
 A1_SAME = ("1ca7d9c802f6130c8143e65a4b66807280fad97935bfdc84b75213bb75aba90b",    # first freeze
-           "9ec4735a53e9879006e0ca9fe41353b31cd05db7c605f1f3d3af4bfb64c89980")    # after A1
+           "9ec4735a53e9879006e0ca9fe41353b31cd05db7c605f1f3d3af4bfb64c89980",    # after A1
+           "e9111f86e90f59f9d5763e083760c9a41ca76fd1c218c3be0fcb110a922bd1ca")                                                              # after A2
 
 
 def code_sha():

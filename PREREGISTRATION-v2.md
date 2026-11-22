@@ -136,3 +136,9 @@ summary records the hash it ran with.
 (`y1184129-2026`) held a single reverse auction and no B bid, so no bid was left after cleaning and the frozen v1 code failed
 on the empty frame. `run_shard.py` now writes empty outputs for such a shard (v1 file unchanged). New sha256 of `run_shard.py`:
 `baa626cdeab7b975c804510783e4f5d2067b4337fd912a803bf6777a984c6673`; new pinned code hash: `e9111f86e90f59f9d5763e083760c9a41ca76fd1c218c3be0fcb110a922bd1ca` (items pinned to the two earlier hashes are accepted; same definitions).
+
+**A3 (2026-11-22 08:20 IST, robustness fix, no definition changed).** Three small GePNIC shards with no usable submission
+time (eprocuregsl 2011, jharkhandtenders 2010, assamtenders 2013) failed because SYNC2 returned without its percentile
+column. SYNC2 now returns NaN for it, and `tender_v2` treats any part a shard cannot compute as missing (it already skipped
+missing parts). New sha256: `screens/v2.py` `04268cb0c996adfbef75d84823da41e5532bf7e994776784287191a10d21ea22`, `run_shard.py` `4848b1b11b2aaaae70de9bf481cfd6a8d7279e468431d5df02b633a0e4ef5fcd`; pinned code hash `64464812b3aa745a5ff14b3583e8d5dc5411c107296e1cc8d328e7ba75f2e867` (earlier hashes
+accepted).
