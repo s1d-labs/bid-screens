@@ -215,13 +215,19 @@ def main():
                 got = {}
                 for proj in sorted({x["project"] for x in p["shards"]}):
                     ks = [k for k in keys if k.startswith(proj + "/")]
-                    urls = {}
-                    for i in range(0, len(ks), 100):
-                        urls.update(hub.read_urls(proj, ks[i:i + 100]))
-                    for k, u in urls.items():
-                        t = time.time(); r = s.get(u, timeout=(30, 300))
-                        hub.metric("n_http"); hub.metric("t_http_s", time.time() - t)
-                        got[k] = r.content if r.status_code == 200 else None
+                    for i in range(0, len(ks), 100):              # sign and fetch one batch at a time (links expire)
+                        for k, u in hub.read_urls(proj, ks[i:i + 100]).items():
+                            for attempt in range(3):
+                                t = time.time(); r = s.get(u, timeout=(30, 300))
+                                hub.metric("n_http"); hub.metric("t_http_s", time.time() - t)
+                                if r.status_code in (200, 404):
+                                    break
+                                hub.metric(f"http_{r.status_code}")
+                                u = hub.read_urls(proj, [k])[k]
+                            got[k] = r.content if r.status_code == 200 else None
+                    missing = [k for k in ks if k.endswith("summary.json") and got.get(k) is None]
+                    if missing:
+                        raise RuntimeError(f"{len(missing)} shard summaries of {proj} could not be read, e.g. {missing[0]}")
                 blobs = {}
                 for x in p["shards"]:
                     blobs[x["shard"]] = {n: got.get(f"{x['project']}/out/{x['shard']}/{n}") for n in NAMES}

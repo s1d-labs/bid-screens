@@ -145,3 +145,8 @@ accepted).
 
 **A4 (2026-11-22 08:40 IST, transport fix, no definition changed).** The `rank` task asked the hub for 200 read links per
 call; the hub allows 100. Now 100. New sha256 of `rank.py`: `178a3888ad1ff44d8fa093c8db56ab26558fdb6d042e0311d0bab60eb297e966`. No output had been produced.
+
+**A5 (2026-11-22 09:12 IST, transport fix, no definition changed).** The first `rank` run asked for all read links of a
+project first and fetched them one by one; links expired before the end, so it read 1,005 of 1,152 shard summaries. Its
+outputs were downloaded but **not used** (only the count line was read). `rank.py` now signs and fetches per batch of 100,
+re-signs on an error and fails if any summary is missing. New sha256 of `rank.py`: `9a1f67d58249381a45ff6de0042180fb95a4aeb36bb730db9bd270e406ac89b5`.
