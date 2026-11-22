@@ -34,7 +34,8 @@ START = time.time()
 MIN_BUDGET_MIN = float(os.environ.get("BID_SCREENS_MIN_BUDGET_MIN", "30"))   # no new shard with less time left (a shard takes <= ~20 min)
 V1_ROUNDS = 200
 # preregistration-v2 A1: the hash before the tie12 bug fix; its definitions are the same, so its items run here too
-A1_SAME = ("1ca7d9c802f6130c8143e65a4b66807280fad97935bfdc84b75213bb75aba90b",)
+A1_SAME = ("1ca7d9c802f6130c8143e65a4b66807280fad97935bfdc84b75213bb75aba90b",    # first freeze
+           "9ec4735a53e9879006e0ca9fe41353b31cd05db7c605f1f3d3af4bfb64c89980")    # after A1
 
 
 def code_sha():
@@ -60,6 +61,9 @@ def run_v1(t, b, dirs, rounds=V1_ROUNDS):
     t["closing"] = v1._naive(t["closing"]); t["published"] = v1._naive(t["published"])
     keep_b = ["tender_id", "seller_id", "seller_key", "tech", "submitted_at", "price", "rank_n", "mse"]
     t, b, log = v1.clean(t, b[keep_b])
+    if b.empty:                     # A2: no bid left after cleaning (only RA bids): v1 has nothing to screen here
+        e = pd.DataFrame()
+        return pd.DataFrame(columns=["tender_id"]), e, pd.DataFrame(columns=["tender_id", "a", "b"]), e, e, {**log, "empty": True}
     ts = v1.within_class_percentiles(v1.tender_screens(t, b))
     bp = b[b["tech"].isin([1, 2, 3]) | b["tech"].isna()]
     g = v1.pair_core(bp, t)
@@ -80,6 +84,11 @@ def run_v2(t, b, dirs, source):
     t, b = v2.prepare(t, b, source)
     link = v2.ra_join(t, b) if source == "gem" else pd.DataFrame(columns=["ra_id", "b_id", "n_ra"])
     te, be = v2.effective(t, b, link)
+    n_ra = int((t["ref_type"].astype(str) != "B").sum())
+    if be.empty:                    # A2: no bid on a B tender: nothing to screen
+        e = pd.DataFrame()
+        return (pd.DataFrame(columns=["tender_id", "yr", "source", "regulated"]), e, pd.DataFrame(columns=["tender_id", "a", "b"]), e,
+                pd.DataFrame(columns=["n_tenders", "closed_flag"]), link, {"ra_tenders": n_ra, "ra_linked": int(len(link)), "b_tenders": int(len(te)), "empty": True})
     ts = v2.tender_v2(te, be)
     g, links, pl = v2.pairs_v2(te, be, dirs)
     mk, cst = v2.closed_set(te, be)

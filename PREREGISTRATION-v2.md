@@ -131,3 +131,8 @@ on the runners before any output was written; no result was looked at. New sha25
 `1c21cf52f92cac5cb1e7f896806d1a79a47cb4847dc2bdd11355d052ae8aff48` (it also accepts items pinned to the first hash, whose definitions are the same, so old and new runner checkouts do
 not reject each other's items). New pinned code hash: `9ec4735a53e9879006e0ca9fe41353b31cd05db7c605f1f3d3af4bfb64c89980`. Shards finished under the first hash are kept; each shard
 summary records the hash it ran with.
+
+**A2 (2026-11-22 08:05 IST, robustness fix in the task wrapper, no definition changed).** One GeM year shard
+(`y1184129-2026`) held a single reverse auction and no B bid, so no bid was left after cleaning and the frozen v1 code failed
+on the empty frame. `run_shard.py` now writes empty outputs for such a shard (v1 file unchanged). New sha256 of `run_shard.py`:
+`baa626cdeab7b975c804510783e4f5d2067b4337fd912a803bf6777a984c6673`; new pinned code hash: `e9111f86e90f59f9d5763e083760c9a41ca76fd1c218c3be0fcb110a922bd1ca` (items pinned to the two earlier hashes are accepted; same definitions).
