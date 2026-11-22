@@ -151,8 +151,8 @@ def leads(m2, pairs):
 
 def get(hub, session, keys):
     out = {}
-    for i in range(0, len(keys), 200):
-        urls = hub.read_urls(PROJECT, keys[i:i + 200])
+    for i in range(0, len(keys), 100):
+        urls = hub.read_urls(PROJECT, keys[i:i + 100])
         for k, u in urls.items():
             t = time.time()
             r = session.get(u, timeout=(30, 300))
@@ -216,8 +216,8 @@ def main():
                 for proj in sorted({x["project"] for x in p["shards"]}):
                     ks = [k for k in keys if k.startswith(proj + "/")]
                     urls = {}
-                    for i in range(0, len(ks), 200):
-                        urls.update(hub.read_urls(proj, ks[i:i + 200]))
+                    for i in range(0, len(ks), 100):
+                        urls.update(hub.read_urls(proj, ks[i:i + 100]))
                     for k, u in urls.items():
                         t = time.time(); r = s.get(u, timeout=(30, 300))
                         hub.metric("n_http"); hub.metric("t_http_s", time.time() - t)

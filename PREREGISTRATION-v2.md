@@ -142,3 +142,6 @@ time (eprocuregsl 2011, jharkhandtenders 2010, assamtenders 2013) failed because
 column. SYNC2 now returns NaN for it, and `tender_v2` treats any part a shard cannot compute as missing (it already skipped
 missing parts). New sha256: `screens/v2.py` `04268cb0c996adfbef75d84823da41e5532bf7e994776784287191a10d21ea22`, `run_shard.py` `4848b1b11b2aaaae70de9bf481cfd6a8d7279e468431d5df02b633a0e4ef5fcd`; pinned code hash `64464812b3aa745a5ff14b3583e8d5dc5411c107296e1cc8d328e7ba75f2e867` (earlier hashes
 accepted).
+
+**A4 (2026-11-22 08:40 IST, transport fix, no definition changed).** The `rank` task asked the hub for 200 read links per
+call; the hub allows 100. Now 100. New sha256 of `rank.py`: `178a3888ad1ff44d8fa093c8db56ab26558fdb6d042e0311d0bab60eb297e966`. No output had been produced.
