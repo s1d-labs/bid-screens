@@ -313,6 +313,9 @@ def finish(ts, g, links, cs_t):
 
 def market_v2(ts, mk_closed):
     ts = ts.copy()
+    for c in ("tie12", "single_bid", "sync2_flag", "dq_flag", "dq2", "price_rank", "pair_v2_t", "tender_v2"):
+        if c not in ts:                                            # a shard without priced tenders has no tie12 (A1)
+            ts[c] = np.nan
     ts["m"] = ts["buyer_id"].astype(str) + "|" + ts["item_id"].astype(str) + "|" + ts["yr"].astype(str)
     ts["price_rank_nr"] = ts["price_rank"].where(~ts["regulated"].astype(bool))
     m = ts.groupby("m").agg(source=("source", "first"), buyer_id=("buyer_id", "first"), item_id=("item_id", "first"),

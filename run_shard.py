@@ -33,6 +33,8 @@ BUDGET_MIN = float(os.environ.get("SCRAPE_MAX_HOURS", "1")) * 60
 START = time.time()
 MIN_BUDGET_MIN = float(os.environ.get("BID_SCREENS_MIN_BUDGET_MIN", "30"))   # no new shard with less time left (a shard takes <= ~20 min)
 V1_ROUNDS = 200
+# preregistration-v2 A1: the hash before the tie12 bug fix; its definitions are the same, so its items run here too
+A1_SAME = ("1ca7d9c802f6130c8143e65a4b66807280fad97935bfdc84b75213bb75aba90b",)
 
 
 def code_sha():
@@ -210,7 +212,7 @@ def main():
                     time.sleep(5); continue
                 break
             it = items[0]; p = it["payload"]
-            if p.get("code") != sha and not p.get("synthetic"):
+            if p.get("code") not in (sha, *A1_SAME) and not p.get("synthetic"):
                 hub.complete([it["key"]], "failed", error=f"code {sha[:12]} differs from the pinned {str(p.get('code'))[:12]}")
                 hub.metric("code_mismatch"); break
             try:

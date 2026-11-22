@@ -125,4 +125,9 @@ Same as v1 section 9; also: no dated directors (P4 stays current directors), no 
   `1ca7d9c802f6130c8143e65a4b66807280fad97935bfdc84b75213bb75aba90b`. A runner with another hash refuses the item.
 
 ## 11. Amendments
-(none yet)
+**A1 (2026-11-22 07:03 IST, bug fix, no definition or threshold changed).** Two GeM shards without any tender with >= 2
+priced bids failed in `market_v2` (column `tie12` absent). Missing tender columns are now NaN before the rollup. They failed
+on the runners before any output was written; no result was looked at. New sha256: `screens/v2.py` `14d8a2ada3b1d16a1e698569cedaa519ea30bb82989a222995a1b340f0e2c28f`, `run_shard.py`
+`1c21cf52f92cac5cb1e7f896806d1a79a47cb4847dc2bdd11355d052ae8aff48` (it also accepts items pinned to the first hash, whose definitions are the same, so old and new runner checkouts do
+not reject each other's items). New pinned code hash: `9ec4735a53e9879006e0ca9fe41353b31cd05db7c605f1f3d3af4bfb64c89980`. Shards finished under the first hash are kept; each shard
+summary records the hash it ran with.
