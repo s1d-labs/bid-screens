@@ -150,3 +150,9 @@ call; the hub allows 100. Now 100. New sha256 of `rank.py`: `178a3888ad1ff44d8fa
 project first and fetched them one by one; links expired before the end, so it read 1,005 of 1,152 shard summaries. Its
 outputs were downloaded but **not used** (only the count line was read). `rank.py` now signs and fetches per batch of 100,
 re-signs on an error and fails if any summary is missing. New sha256 of `rank.py`: `9a1f67d58249381a45ff6de0042180fb95a4aeb36bb730db9bd270e406ac89b5`.
+
+**A6 (2026-11-22 10:00 IST, analysis fix, no definition changed).** In the national task, the market-level validation
+(section 6, secondary) joined labelled tenders to market-years with a key in which buyer and item ids were written as
+floats ("1401.0"), so it matched no market. The same function (`rank.validation`) was re-run on the server, at nice 15,
+on the downloaded national files with integer keys (`national/run-2026-11-22b/validation_market_fixed.json`). The
+tender-level (primary) results are unaffected (they do not use the market key) and equal in both runs.
