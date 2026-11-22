@@ -9,12 +9,12 @@ from pathlib import Path
 
 FAMILY = json.loads((Path(__file__).parent / "scrape.json").read_text())["family"]
 
-# 58 + 20 + 1 worker processes = at most 40 runner jobs at 2 processes per job (owner: a share of <= 40 jobs)
+# 20 + 58 + 1 worker processes = at most 40 runner jobs at 2 processes per job (owner: a share of <= 40 jobs)
 PROJECTS = [
     {"name": f"{FAMILY}-gem", "title": "Bid screens v1 + v2 on GeM bids (shards of item classes)", "task": "screens",
-     "unit_label": "shard", "record_label": "shard summary", "max_workers": 58},
-    {"name": f"{FAMILY}-gepnic", "title": "Bid screens v1 + v2 on GePNIC bid lists (portal-year shards)", "task": "screens",
      "unit_label": "shard", "record_label": "shard summary", "max_workers": 20},
+    {"name": f"{FAMILY}-gepnic", "title": "Bid screens v1 + v2 on GePNIC bid lists (portal-year shards)", "task": "screens",
+     "unit_label": "shard", "record_label": "shard summary", "max_workers": 58},
     {"name": f"{FAMILY}-rank", "title": "Bid screens: national ranks, base rates and validation", "task": "rank",
      "unit_label": "run", "record_label": "national run", "max_workers": 1},
 ]

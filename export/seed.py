@@ -16,7 +16,8 @@ from run_shard import code_sha  # noqa: E402
 
 def main():
     project, files = sys.argv[1], sys.argv[2:]
-    sha, rows, directors = code_sha(), [], None
+    import os
+    sha, rows, directors = os.environ.get("SEED_CODE") or code_sha(), [], None   # SEED_CODE: a hash both old and new checkouts accept (A1)
     for f in files:
         for l in open(f):
             x = json.loads(l)

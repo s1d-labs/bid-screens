@@ -15,7 +15,7 @@ A screen flag is an **indicator** ("screen flags"), never a finding about any fi
 | `rank.py` | task `rank`: national composites, base rates, validation, lead lists -> `national/<run>/` |
 | `export/` | box side: `gem_export.py`, `gepnic_export.py` (+ `.sql`), `push.sh`/`push.py` (upload with the hub's client), `seed.py` |
 
-Projects: `bid-screens-gem`, `bid-screens-gepnic` (task `screens`), `bid-screens-rank` (task `rank`); 58 + 20 + 1 worker
+Projects: `bid-screens-gem`, `bid-screens-gepnic` (task `screens`), `bid-screens-rank` (task `rank`); 20 + 58 + 1 worker
 processes at most (<= 40 runner jobs). Queue items name bucket keys and the pinned code hash; the task refuses another hash.
 
 Check: `python -m pytest tests` and

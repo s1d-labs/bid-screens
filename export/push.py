@@ -34,7 +34,7 @@ def main():
         k = f"{project}/inputs/gem/directors.parquet"
         if have.get(k) != f.stat().st_size:
             s3.upload_file(str(f), bucket, k, ExtraArgs={"ContentType": "application/octet-stream"})
-    for sh in shards:
+    def one(sh):
         keys, total = [], 0
         for name, size in sh["files"].items():
             p = stage / sh["shard"] / name
@@ -50,8 +50,16 @@ def main():
         if ok and delete:
             for name in sh["files"]:
                 (stage / sh["shard"] / name).unlink(missing_ok=True)
-        print(json.dumps({"shard": sh["shard"], "source": sh["source"], "keys": keys, "bytes": total, "verified": ok,
-                          "store": store, "n_tenders": sh.get("n_tenders"), "n_bids": sh.get("n_bids")}), flush=True)
+        return {"shard": sh["shard"], "source": sh["source"], "keys": keys, "bytes": total, "verified": ok,
+                "store": store, "n_tenders": sh.get("n_tenders"), "n_bids": sh.get("n_bids")}
+
+    import concurrent.futures as cf
+    with cf.ThreadPoolExecutor(8) as ex:
+        for fut in cf.as_completed([ex.submit(one, sh) for sh in shards]):
+            try:
+                print(json.dumps(fut.result()), flush=True)
+            except Exception as e:                      # this shard is left out; a re-run uploads it
+                print(json.dumps({"error": f"{type(e).__name__}: {str(e)[:200]}"}), file=sys.stderr, flush=True)
     for f in extra:
         k = f"{project}/inputs/gem/directors.parquet"
         print(json.dumps({"directors": k, "verified": True}), flush=True)
